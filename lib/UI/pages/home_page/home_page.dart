@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../utils/time_utils.dart';
-import '../widgets/clock_button.dart';
+import 'utils/time_utils.dart';
+import 'widgets/clock_button_area/clock_button_area.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Divider(),
-          StartClockButton(
+          ClockButtonArea(
             setShowedTime: (restTime) {
               setState(() {
                 _showedTime = toShowedTime(restTime);
