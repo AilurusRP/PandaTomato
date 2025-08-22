@@ -16,9 +16,35 @@ class ClockButtonArea extends StatefulWidget {
 
 class _ClockButtonAreaState extends State<ClockButtonArea> {
   TimerState _timerState = TimerState.beforeStart;
+  late int _time;
 
   setTimerState(TimerState newState) {
-    _timerState = newState;
+    setState(() {
+      _timerState = newState;
+    });
+  }
+
+  setTime(int time) {
+    _time = time;
+  }
+
+  count() async {
+    while (_time > 0) {
+      await Future.delayed(Duration(seconds: 1));
+      if (_timerState == TimerState.paused ||
+          _timerState == TimerState.beforeStart) {
+        return;
+      }
+      _time--;
+      widget.setShowedTime(_time);
+    }
+    cancel();
+  }
+
+  cancel() {
+    _time = 0;
+    widget.setShowedTime(0);
+    setTimerState(TimerState.beforeStart);
   }
 
   @override
@@ -33,15 +59,17 @@ class _ClockButtonAreaState extends State<ClockButtonArea> {
               StartTimerButton(
                 setShowedTime: widget.setShowedTime,
                 setTimerState: setTimerState,
+                setTime: setTime,
+                count: count,
               ),
             ],
             TimerState.started => [
               PauseTimerButton(setTimerState: setTimerState),
-              CancelTimerButton(setTimerState: setTimerState),
+              CancelTimerButton(cancel: cancel),
             ],
             TimerState.paused => [
-              ResumeTimerButton(setTimerState: setTimerState),
-              CancelTimerButton(setTimerState: setTimerState),
+              ResumeTimerButton(setTimerState: setTimerState, count: count),
+              CancelTimerButton(cancel: cancel),
             ],
           },
         ),

@@ -13,8 +13,11 @@ class PauseTimerButton extends StatefulWidget {
 class _PauseTimerButtonState extends State<PauseTimerButton> {
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(child: Text("暂停"), onPressed: () {
-      widget.setTimerState(TimerState.paused);
-    });
+    return OutlinedButton(
+      child: Text("暂停"),
+      onPressed: () {
+        widget.setTimerState(TimerState.paused);
+      },
+    );
   }
 }

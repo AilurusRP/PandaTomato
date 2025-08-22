@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../../../utils/timer_core.dart';
 import '../../../utils/time_utils.dart';
 import '../../../utils/timer_state.dart';
 
 class StartTimerButton extends StatefulWidget {
   final void Function(int) setShowedTime;
-
   final Function(TimerState) setTimerState;
+  final Function(int) setTime;
+  final VoidCallback count;
 
   const StartTimerButton({
     super.key,
     required this.setShowedTime,
     required this.setTimerState,
+    required this.setTime,
+    required this.count,
   });
 
   @override
@@ -62,8 +64,8 @@ class _StartTimerButtonState extends State<StartTimerButton> {
                             rawTimeStringInputController.text,
                           );
                           widget.setShowedTime(totalTime);
-                          TimerCore timer = TimerCore.getTimer(totalTime);
-                          timer.count(widget.setShowedTime);
+                          widget.setTime(totalTime);
+                          widget.count();
                           widget.setTimerState(TimerState.started);
                         }
                         rawTimeStringInputController.clear();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 int getTime(String rawTimeString) {
   List<int> timeLst = rawTimeString
+      .replaceAll("：", ":")
       .split(":")
       .map<int>((item) => int.parse(item))
       .toList();
@@ -31,12 +32,16 @@ InputTimeState checkTimeInput(
   } else if (controller.text.isEmpty) {
     showAlertDialog(context, InputTimeState.inputIsEmpty);
     return InputTimeState.inputIsEmpty;
-  } else if (!controller.text.contains(RegExp(r"^[0-9:]+$")) ||
-      controller.text.split(":").length > 3 ||
-      controller.text
+  }
+
+  String controllerText = controller.text.replaceAll("：", ":");
+
+  if (!controllerText.contains(RegExp(r"^[0-9:]+$")) ||
+      controllerText.split(":").length > 3 ||
+      controllerText
           .split(":")
           .any((item) => int.parse(item) >= 60 || int.parse(item) < 0)) {
-    // 时间只能为 n:nn:nn 或 nn:nn 或 nn 的格式
+    // 时间只能为 h:mm:ss 或 mm:ss 或 ss 的格式
     showAlertDialog(context, InputTimeState.wrongTimeFormat);
     return InputTimeState.wrongTimeFormat;
   } else {

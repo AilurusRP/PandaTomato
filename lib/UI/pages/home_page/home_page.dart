@@ -12,7 +12,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _timeController = TextEditingController();
   String _showedTime = "0:00:00";
 
   @override
