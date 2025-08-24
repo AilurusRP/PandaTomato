@@ -7,46 +7,27 @@ import '../../utils/timer_state.dart';
 
 class ClockButtonArea extends StatefulWidget {
   final void Function(int) setShowedTime;
+  final TimerState timerState;
+  final Function(TimerState) setTimerState;
+  final Function(int) setTime;
+  final Function() cancelTimer;
+  final Future<void> Function() startCount;
 
-  const ClockButtonArea({super.key, required this.setShowedTime});
+  const ClockButtonArea({
+    super.key,
+    required this.setShowedTime,
+    required this.timerState,
+    required this.setTimerState,
+    required this.setTime,
+    required this.cancelTimer,
+    required this.startCount,
+  });
 
   @override
   State<ClockButtonArea> createState() => _ClockButtonAreaState();
 }
 
 class _ClockButtonAreaState extends State<ClockButtonArea> {
-  TimerState _timerState = TimerState.beforeStart;
-  late int _time;
-
-  setTimerState(TimerState newState) {
-    setState(() {
-      _timerState = newState;
-    });
-  }
-
-  setTime(int time) {
-    _time = time;
-  }
-
-  count() async {
-    while (_time > 0) {
-      await Future.delayed(Duration(seconds: 1));
-      if (_timerState == TimerState.paused ||
-          _timerState == TimerState.beforeStart) {
-        return;
-      }
-      _time--;
-      widget.setShowedTime(_time);
-    }
-    cancel();
-  }
-
-  cancel() {
-    _time = 0;
-    widget.setShowedTime(0);
-    setTimerState(TimerState.beforeStart);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -54,22 +35,25 @@ class _ClockButtonAreaState extends State<ClockButtonArea> {
         alignment: Alignment.center,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: switch (_timerState) {
+          children: switch (widget.timerState) {
             TimerState.beforeStart => [
               StartTimerButton(
                 setShowedTime: widget.setShowedTime,
-                setTimerState: setTimerState,
-                setTime: setTime,
-                count: count,
+                setTimerState: widget.setTimerState,
+                setTime: widget.setTime,
+                startCount: widget.startCount,
               ),
             ],
             TimerState.started => [
-              PauseTimerButton(setTimerState: setTimerState),
-              CancelTimerButton(cancel: cancel),
+              PauseTimerButton(setTimerState: widget.setTimerState),
+              CancelTimerButton(cancel: widget.cancelTimer),
             ],
             TimerState.paused => [
-              ResumeTimerButton(setTimerState: setTimerState, count: count),
-              CancelTimerButton(cancel: cancel),
+              ResumeTimerButton(
+                setTimerState: widget.setTimerState,
+                startCount: widget.startCount,
+              ),
+              CancelTimerButton(cancel: widget.cancelTimer),
             ],
           },
         ),

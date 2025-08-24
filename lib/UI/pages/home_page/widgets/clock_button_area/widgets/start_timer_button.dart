@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/time_utils.dart';
 import '../../../utils/timer_state.dart';
 
@@ -6,14 +8,14 @@ class StartTimerButton extends StatefulWidget {
   final void Function(int) setShowedTime;
   final Function(TimerState) setTimerState;
   final Function(int) setTime;
-  final VoidCallback count;
+  final Future<void> Function() startCount;
 
   const StartTimerButton({
     super.key,
     required this.setShowedTime,
     required this.setTimerState,
     required this.setTime,
-    required this.count,
+    required this.startCount,
   });
 
   @override
@@ -21,7 +23,7 @@ class StartTimerButton extends StatefulWidget {
 }
 
 class _StartTimerButtonState extends State<StartTimerButton> {
-  TextEditingController rawTimeStringInputController = TextEditingController();
+  var rawTimeStringInputController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -53,19 +55,33 @@ class _StartTimerButtonState extends State<StartTimerButton> {
                     constraints: BoxConstraints(maxHeight: 40),
                     margin: EdgeInsets.all(10),
                     child: OutlinedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
                         if (checkTimeInput(
                               context,
                               rawTimeStringInputController,
                             ) ==
                             InputTimeState.correctInput) {
+                          SharedPreferencesWithCache prefs =
+                              await SharedPreferencesWithCache.create(
+                                cacheOptions:
+                                    SharedPreferencesWithCacheOptions(),
+                              );
+
                           int totalTime = getTime(
                             rawTimeStringInputController.text,
                           );
+                          int currentTimestamp =
+                              DateTime.now().millisecondsSinceEpoch;
+                          String timerData = json.encode({
+                            "currentTimestamp": currentTimestamp,
+                            "totalTime": totalTime,
+                          });
+                          prefs.setString("timerData", timerData);
+
                           widget.setShowedTime(totalTime);
                           widget.setTime(totalTime);
-                          widget.count();
+                          widget.startCount();
                           widget.setTimerState(TimerState.started);
                         }
                         rawTimeStringInputController.clear();

@@ -4,12 +4,12 @@ import '../../../utils/timer_state.dart';
 class ResumeTimerButton extends StatefulWidget {
   final Function(TimerState) setTimerState;
 
-  final VoidCallback count;
+  final Future<void> Function() startCount;
 
   const ResumeTimerButton({
     super.key,
     required this.setTimerState,
-    required this.count,
+    required this.startCount,
   });
 
   @override
@@ -23,7 +23,7 @@ class _ResumeTimerButtonState extends State<ResumeTimerButton> {
       child: Text("重启"),
       onPressed: () {
         widget.setTimerState(TimerState.started);
-        widget.count();
+        widget.startCount();
       },
     );
   }
