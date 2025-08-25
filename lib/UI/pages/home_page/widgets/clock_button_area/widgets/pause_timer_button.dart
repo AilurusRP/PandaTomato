@@ -17,10 +17,11 @@ class PauseTimerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       child: Text("暂停"),
-      onPressed: () async {
-        var timerCache = TimerCacheUtils();
-        timerCache.setPausedCache(true);
-        timerCache.setRestTimeCache(timeCount);
+      onPressed: () {
+        TimerCacheUtils.create().then((timerCache) {
+          timerCache.setPausedCache(true);
+          timerCache.setRestTimeCache(timeCount);
+        });
         setTimerState(TimerState.paused);
       },
     );

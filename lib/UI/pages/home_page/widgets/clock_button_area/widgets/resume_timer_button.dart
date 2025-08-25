@@ -18,11 +18,13 @@ class ResumeTimerButton extends StatelessWidget {
     return OutlinedButton(
       child: Text("重启"),
       onPressed: () {
-        var timerCache = TimerCacheUtils();
-        timerCache.setPausedCache(false);
-        timerCache.setInitialTimestampCache(
-          DateTime.now().millisecondsSinceEpoch,
-        );
+        TimerCacheUtils.create().then((timerCache) {
+          timerCache.setPausedCache(false);
+          timerCache.setInitialTimestampCache(
+            DateTime.now().millisecondsSinceEpoch,
+          );
+        });
+
         setTimerState(TimerState.started);
         startCount();
       },

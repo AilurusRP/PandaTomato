@@ -85,9 +85,10 @@ class _MyHomePageState extends State<MyHomePage> {
     cancelTimer();
   }
 
-  void cancelTimer() {
-    var timerCache = TimerCacheUtils();
-    timerCache.clearCache();
+  void cancelTimer() async {
+    TimerCacheUtils.create().then((timerCache) {
+      timerCache.clearCache();
+    });
     _timeCount = 0;
     setShowedTime(0);
     setTimerState(TimerState.beforeStart);
@@ -100,11 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> checkTimerDataCacheOnInit() async {
-    var timerCache = TimerCacheUtils();
+    var timerCache = await TimerCacheUtils.create();
 
     bool? paused = await timerCache.getPausedCache();
-    print("ppppppppppppppppppppppppppppppppppppp");
-    print(paused);
     if (paused == null) return;
 
     int currentTime = DateTime.now().millisecondsSinceEpoch;

@@ -69,12 +69,13 @@ class _StartTimerButtonState extends State<StartTimerButton> {
                           int currentTimestamp =
                               DateTime.now().millisecondsSinceEpoch;
 
-                          var timerCacheUtils = TimerCacheUtils();
-                          timerCacheUtils.setInitialTimestampCache(
-                            currentTimestamp,
-                          );
-                          timerCacheUtils.setRestTimeCache(totalTime);
-                          timerCacheUtils.setPausedCache(false);
+                          TimerCacheUtils.create().then((timerCache) {
+                            timerCache.setInitialTimestampCache(
+                              currentTimestamp,
+                            );
+                            timerCache.setRestTimeCache(totalTime);
+                            timerCache.setPausedCache(false);
+                          });
 
                           widget.setShowedTime(totalTime);
                           widget.setTime(totalTime);
