@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:panda_tomato/UI/pages/home_page/utils/timer_cache_utils.dart';
 import '../../../utils/timer_state.dart';
 
-class ResumeTimerButton extends StatefulWidget {
+class ResumeTimerButton extends StatelessWidget {
   final Function(TimerState) setTimerState;
 
   final Future<void> Function() startCount;
@@ -13,17 +14,17 @@ class ResumeTimerButton extends StatefulWidget {
   });
 
   @override
-  State<ResumeTimerButton> createState() => _ResumeTimerButtonState();
-}
-
-class _ResumeTimerButtonState extends State<ResumeTimerButton> {
-  @override
   Widget build(BuildContext context) {
     return OutlinedButton(
       child: Text("重启"),
       onPressed: () {
-        widget.setTimerState(TimerState.started);
-        widget.startCount();
+        var timerCache = TimerCacheUtils();
+        timerCache.setPausedCache(false);
+        timerCache.setInitialTimestampCache(
+          DateTime.now().millisecondsSinceEpoch,
+        );
+        setTimerState(TimerState.started);
+        startCount();
       },
     );
   }

@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../utils/timer_state.dart';
 
-class CancelTimerButton extends StatefulWidget {
-  final VoidCallback cancel;
+class CancelTimerButton extends StatelessWidget {
+  final VoidCallback cancelTimer;
 
-  const CancelTimerButton({super.key, required this.cancel});
+  const CancelTimerButton({super.key, required this.cancelTimer});
 
-  @override
-  State<CancelTimerButton> createState() => _CancelTimerButtonState();
-}
-
-class _CancelTimerButtonState extends State<CancelTimerButton> {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
@@ -31,7 +26,7 @@ class _CancelTimerButtonState extends State<CancelTimerButton> {
                       children: [
                         OutlinedButton(
                           onPressed: () {
-                            widget.cancel();
+                            cancelTimer();
                             Navigator.pop(context);
                           },
                           child: Text("确定"),

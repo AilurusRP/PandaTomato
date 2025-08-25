@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:panda_tomato/UI/pages/home_page/utils/timer_cache_utils.dart';
 import 'package:panda_tomato/UI/pages/home_page/utils/timer_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'utils/time_utils.dart';
 import 'widgets/clock_button_area/clock_button_area.dart';
 
@@ -18,11 +18,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _showedTime = "0:00:00";
   TimerState _timerState = TimerState.beforeStart;
-  late int _time;
+  int _timeCount = 0;
 
   @override
   void initState() {
-    checkTimerDataCache();
+    checkTimerDataCacheOnInit();
     super.initState();
   }
 
@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
             setTime: setTime,
             cancelTimer: cancelTimer,
             startCount: startCount,
+            timeCount: _timeCount,
           ),
         ],
       ),
@@ -68,24 +69,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void setTime(int time) {
-    _time = time;
+    _timeCount = time;
   }
 
   Future<void> startCount() async {
-    while (_time > 0) {
+    while (_timeCount > 0) {
       await Future.delayed(Duration(seconds: 1));
       if (_timerState == TimerState.paused ||
           _timerState == TimerState.beforeStart) {
         return;
       }
-      _time--;
-      setShowedTime(_time);
+      _timeCount--;
+      setShowedTime(_timeCount);
     }
     cancelTimer();
   }
 
   void cancelTimer() {
-    _time = 0;
+    var timerCache = TimerCacheUtils();
+    timerCache.clearCache();
+    _timeCount = 0;
     setShowedTime(0);
     setTimerState(TimerState.beforeStart);
   }
@@ -96,27 +99,32 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> checkTimerDataCache() async {
-    var prefs = await SharedPreferencesWithCache.create(
-      cacheOptions: SharedPreferencesWithCacheOptions(),
-    );
+  Future<void> checkTimerDataCacheOnInit() async {
+    var timerCache = TimerCacheUtils();
 
-    String? timerDataString = await prefs.getString("timerData");
-    if (timerDataString != null) {
-      var timerData = json.decode(timerDataString);
-      int currentTime = DateTime.now().millisecondsSinceEpoch;
+    bool? paused = await timerCache.getPausedCache();
+    print("ppppppppppppppppppppppppppppppppppppp");
+    print(paused);
+    if (paused == null) return;
 
-      if (timerData["currentTimestamp"] != null &&
-          timerData["totalTime"] != null) {
-        num pastTime = (currentTime - timerData["currentTimestamp"]!) ~/ 1000;
-        int restTime = timerData["totalTime"]! - pastTime;
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int initialTimestamp = (await timerCache.getInitialTimestampCache())!;
+    print(initialTimestamp);
+    int restTimeFromCache = (await timerCache.getRestTimeCache())!;
 
-        if (restTime > 0) {
-          setTime(restTime);
-          startCount();
-          setTimerState(TimerState.started);
-        }
+    if (!paused) {
+      int pastTime = (currentTime - initialTimestamp) ~/ 1000;
+      int restTime = restTimeFromCache - pastTime;
+      if (restTime > 0) {
+        setTime(restTime);
+        startCount();
+        setTimerState(TimerState.started);
       }
+    } else {
+      timerCache.setInitialTimestampCache(currentTime);
+      setTime(restTimeFromCache);
+      setShowedTime(restTimeFromCache);
+      setTimerState(TimerState.paused);
     }
   }
 }

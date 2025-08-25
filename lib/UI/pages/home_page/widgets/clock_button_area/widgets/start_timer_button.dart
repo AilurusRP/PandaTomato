@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:panda_tomato/UI/pages/home_page/utils/timer_cache_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/time_utils.dart';
 import '../../../utils/timer_state.dart';
@@ -62,22 +63,18 @@ class _StartTimerButtonState extends State<StartTimerButton> {
                               rawTimeStringInputController,
                             ) ==
                             InputTimeState.correctInput) {
-                          SharedPreferencesWithCache prefs =
-                              await SharedPreferencesWithCache.create(
-                                cacheOptions:
-                                    SharedPreferencesWithCacheOptions(),
-                              );
-
                           int totalTime = getTime(
                             rawTimeStringInputController.text,
                           );
                           int currentTimestamp =
                               DateTime.now().millisecondsSinceEpoch;
-                          String timerData = json.encode({
-                            "currentTimestamp": currentTimestamp,
-                            "totalTime": totalTime,
-                          });
-                          prefs.setString("timerData", timerData);
+
+                          var timerCacheUtils = TimerCacheUtils();
+                          timerCacheUtils.setInitialTimestampCache(
+                            currentTimestamp,
+                          );
+                          timerCacheUtils.setRestTimeCache(totalTime);
+                          timerCacheUtils.setPausedCache(false);
 
                           widget.setShowedTime(totalTime);
                           widget.setTime(totalTime);
